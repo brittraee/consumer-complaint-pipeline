@@ -1,0 +1,111 @@
+{
+  "hits": {
+    "hits": [
+      {
+        "_source": {
+          "complaint_id": "1001",
+          "date_received": "2024-03-15",
+          "date_sent_to_company": "2024-03-16",
+          "company": "InComm Financial Services",
+          "product": "Prepaid card",
+          "sub_product": "Gift card",
+          "issue": "Problem with a purchase or transfer",
+          "sub_issue": "Card company isn't resolving a dispute about a purchase on your statement",
+          "complaint_what_happened": "I purchased a $200 Vanilla gift card and the balance was drained before I could use it. InComm denied my refund request.",
+          "company_response": "Closed with explanation",
+          "company_public_response": "",
+          "timely": "Yes",
+          "consumer_disputed": "Yes",
+          "state": "CA",
+          "zip_code": "90210",
+          "submitted_via": "Web",
+          "tags": ""
+        }
+      },
+      {
+        "_source": {
+          "complaint_id": "1002",
+          "date_received": "2024-03-20",
+          "date_sent_to_company": "2024-03-21",
+          "company": "InComm Financial Services",
+          "product": "Prepaid card",
+          "sub_product": "Gift card",
+          "issue": "Trouble using the card",
+          "sub_issue": "Problem with fees charged",
+          "complaint_what_happened": "My gift card was stolen and unauthorized charges were made. I reported the fraud but received no response from the company.",
+          "company_response": "Closed with monetary relief",
+          "company_public_response": "",
+          "timely": "Yes",
+          "consumer_disputed": "No",
+          "state": "TX",
+          "zip_code": "75001",
+          "submitted_via": "Web",
+          "tags": ""
+        }
+      },
+      {
+        "_source": {
+          "complaint_id": "1003",
+          "date_received": "2024-04-10",
+          "date_sent_to_company": "2024-04-11",
+          "company": "InComm Financial Services",
+          "product": "Prepaid card",
+          "sub_product": "Gift card",
+          "issue": "Problem with a purchase or transfer",
+          "sub_issue": "",
+          "complaint_what_happened": "",
+          "company_response": "Closed with explanation",
+          "company_public_response": "",
+          "timely": "No",
+          "consumer_disputed": "",
+          "state": "CA",
+          "zip_code": "94102",
+          "submitted_via": "Phone",
+          "tags": "Older American"
+        }
+      },
+      {
+        "_source": {
+          "complaint_id": "1004",
+          "date_received": "2024-05-01",
+          "date_sent_to_company": "2024-05-02",
+          "company": "InComm Financial Services",
+          "product": "Prepaid card",
+          "sub_product": "Gift card",
+          "issue": "Unexpected or other fees",
+          "sub_issue": "",
+          "complaint_what_happened": "The balance on my gift card was drained. I was scammed. The company denied my refund and said the investigation showed the card was used.",
+          "company_response": "Closed with explanation",
+          "company_public_response": "",
+          "timely": "Yes",
+          "consumer_disputed": "Yes",
+          "state": "NY",
+          "zip_code": "10001",
+          "submitted_via": "Web",
+          "tags": ""
+        }
+      },
+      {
+        "_source": {
+          "complaint_id": "1005",
+          "date_received": "2024-05-15",
+          "date_sent_to_company": "2024-05-16",
+          "company": "InComm Financial Services",
+          "product": "Prepaid card",
+          "sub_product": "General-purpose prepaid card",
+          "issue": "Problem with a purchase or transfer",
+          "sub_issue": "",
+          "complaint_what_happened": "Vanilla gift card activated but balance showed zero. Fraud. They denied replacement card.",
+          "company_response": "Closed with non-monetary relief",
+          "company_public_response": "",
+          "timely": "Yes",
+          "consumer_disputed": "No",
+          "state": "FL",
+          "zip_code": "33101",
+          "submitted_via": "Web",
+          "tags": "Servicemember"
+        }
+      }
+    ]
+  }
+}
