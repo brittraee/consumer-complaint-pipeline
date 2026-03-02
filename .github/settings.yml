@@ -1,0 +1,4 @@
+# Repository settings managed as code
+# See https://github.com/probot/settings for details
+repository:
+  private: true
