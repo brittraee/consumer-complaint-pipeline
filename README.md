@@ -34,7 +34,8 @@ SEC EDGAR ──► sec/edgar.py ──► Filing dataclass ──────�
 | CLI | Click (subcommands, options, help generation) |
 | Reports | Markdown generation |
 | Build | hatchling (PEP 517) |
-| Testing | pytest (70+ tests) |
+| Visualization | matplotlib (Jupyter notebooks) |
+| Testing | pytest (86 tests) |
 | Linting | Ruff |
 
 ## Project Structure
@@ -53,7 +54,8 @@ consumer-complaint-pipeline/
 │   │   └── edgar.py           # SEC EDGAR API client
 │   └── reports/
 │       └── markdown.py        # Report generation
-├── tests/                     # 70+ tests with fixtures
+├── notebooks/                 # Jupyter analysis notebook
+├── tests/                     # 86 tests with fixtures
 ├── pyproject.toml             # Hatchling build config
 └── LICENSE
 ```
@@ -106,6 +108,17 @@ complaint-pipeline report compare --input data/cfpb-complaints/ --output reports
 
 # See all options
 complaint-pipeline --help
+```
+
+## Notebooks
+
+The `notebooks/` directory contains an interactive analysis notebook that imports the pipeline and visualizes live CFPB data with matplotlib:
+
+- **complaint_analysis.ipynb** — Fetches complaint data, runs all analysis functions, and charts monthly trends, geographic distribution, denomination targeting, timing patterns, fraud classification, and response analysis
+
+```bash
+pip install -e ".[notebooks]"
+jupyter notebook notebooks/
 ```
 
 ## Testing
