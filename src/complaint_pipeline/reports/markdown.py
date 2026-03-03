@@ -1,13 +1,4 @@
-"""Markdown report generation.
-
-Refactored from: generate_summary() in cfpb_complaint_pull.py
-                  generate_comparison_report() in complaint_analysis.py
-                  analyze_insider_trading() in sec_filing_analysis.py
-
-Principle: SEPARATE CONCERNS
-Fetching, analyzing, and reporting are three different jobs.
-This module only knows how to format results as Markdown.
-"""
+"""Markdown report generation for CFPB and SEC analysis results."""
 
 from datetime import datetime
 from pathlib import Path

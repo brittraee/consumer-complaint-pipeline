@@ -1,13 +1,4 @@
-"""SEC EDGAR filing client for public company filings.
-
-Refactored from: scripts/sec_filing_analysis.py
-
-Key changes:
-  urllib.request.urlopen() → httpx.get()   (Consistency — same HTTP lib everywhere)
-  Hardcoded OUTPUT_DIR → Path parameters   (Parameterize)
-  Returns dicts → returns Filing objects   (Extract structure)
-  print() → logging                        (Structured output)
-"""
+"""SEC EDGAR filing client for public company filings."""
 
 import csv
 import logging
@@ -29,14 +20,7 @@ PATHWARD_CIK = "0000907471"
 
 
 def fetch_submissions(cik: str = PATHWARD_CIK) -> dict:
-    """Fetch a company's filing submissions from EDGAR.
-
-    Before: urllib.request.urlopen(Request(url, headers=...))
-    After:  httpx.get(url, headers=...)
-
-    Why switch? httpx gives consistent API with the CFPB client,
-    better error messages, and automatic JSON decoding.
-    """
+    """Fetch a company's filing submissions from EDGAR."""
     url = f"https://data.sec.gov/submissions/CIK{cik}.json"
     logger.info("Fetching SEC submissions from %s", url)
 
@@ -46,11 +30,7 @@ def fetch_submissions(cik: str = PATHWARD_CIK) -> dict:
 
 
 def extract_filings(submissions: dict, form_types: list[str] | None = None) -> list[Filing]:
-    """Extract filing records from EDGAR submissions data.
-
-    Before: returned list[dict]
-    After:  returns list[Filing] — typed, with named fields.
-    """
+    """Extract filing records from EDGAR submissions data."""
     recent = submissions.get("filings", {}).get("recent", {})
     forms = recent.get("form", [])
     dates = recent.get("filingDate", [])

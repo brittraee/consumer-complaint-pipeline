@@ -1,11 +1,4 @@
-"""Data models for consumer complaint analysis.
-
-Refactoring principle: EXTRACT STRUCTURE
-Before: raw dicts with string keys — data["complaint_what_happened"]
-After:  typed fields with defaults — complaint.narrative
-
-Named fields catch typos at write-time, not runtime.
-"""
+"""Data models for consumer complaint analysis."""
 
 from dataclasses import asdict, dataclass
 

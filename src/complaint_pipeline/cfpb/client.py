@@ -1,13 +1,4 @@
-"""CFPB complaint data client.
-
-Refactored from: scripts/cfpb_complaint_pull.py
-
-Key changes:
-  subprocess.run(["curl"...]) → httpx.get()     (Replace shell call with library)
-  print() → logging                              (Structured output)
-  Hardcoded OUTPUT_DIR → function parameters      (Parameterize)
-  Returns list[dict] → list[Complaint]            (Extract structure)
-"""
+"""CFPB complaint data client — fetch, write, and load complaint records."""
 
 import csv
 import logging
@@ -40,15 +31,7 @@ BNPL_COMPANIES = {
 
 
 def fetch_complaints(search_term: str, size: int = 1000) -> list[Complaint]:
-    """Fetch complaints from the CFPB API for a search term.
-
-    Before: subprocess.run(["curl", "-s", "-H", "User-Agent: ...", url])
-    After:  httpx.get(url, headers=HEADERS)
-
-    Why? Curl via subprocess is a shell call — you get stdout as a string,
-    have to parse JSON manually, and error handling is clunky. httpx gives you
-    a typed Response object with .json(), .status_code, .raise_for_status().
-    """
+    """Fetch complaints from the CFPB API for a search term."""
     params = {
         "search_term": search_term,
         "size": size,
@@ -85,11 +68,7 @@ def fetch_complaints(search_term: str, size: int = 1000) -> list[Complaint]:
 
 
 def write_csv(complaints: list[Complaint], filepath: Path) -> None:
-    """Write complaint records to CSV.
-
-    Before: hardcoded os.path.join(OUTPUT_DIR, filename)
-    After:  caller passes the full path — portable, testable.
-    """
+    """Write complaint records to CSV."""
     if not complaints:
         logger.warning("No records to write for %s", filepath.name)
         return
@@ -116,9 +95,6 @@ def fetch_all(
     companies: dict[str, str] | None = None,
 ) -> dict[str, list[Complaint]]:
     """Fetch complaints for all configured companies and write CSVs.
-
-    Before: main() did everything — fetch, write, summarize, all hardcoded.
-    After:  fetch_all() handles fetch + write, returns data for downstream use.
 
     Args:
         output_dir: Directory to write CSV files.

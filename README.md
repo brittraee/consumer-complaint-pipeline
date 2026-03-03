@@ -131,15 +131,6 @@ pytest --cov              # With coverage
 
 Tests use fixture data (no live API calls). All analysis functions are pure — data in, results out, no side effects.
 
-## AI Usage
-
-This project was developed with AI assistance (Claude). AI was used for:
-- Boilerplate and scaffolding (CLI structure, CSV I/O, test fixtures)
-- Code review and refactoring guidance (monolithic scripts → modular package)
-- Research on CFPB API endpoints and SEC EDGAR data formats
-
-Core logic (text mining patterns, classification algorithm, API client design, data modeling) was authored manually. All code was reviewed, tested, and understood before inclusion.
-
 ## License
 
 MIT

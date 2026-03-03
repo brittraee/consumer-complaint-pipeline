@@ -5,10 +5,6 @@ Usage:
     complaint-pipeline cfpb analyze --input data/cfpb-complaints/ --output reports/
     complaint-pipeline sec fetch --output data/sec-filings/
     complaint-pipeline report compare --input data/cfpb-complaints/ --output reports/
-
-Why Click? The original scripts ran as 'python3 script.py' with no arguments.
-Click gives you subcommands, options, --help for free, and an installable entry
-point via pyproject.toml [project.scripts].
 """
 
 import logging

@@ -1,15 +1,4 @@
-"""CFPB complaint analysis — pure functions over Complaint data.
-
-Refactored from: scripts/complaint_analysis.py
-
-Key changes:
-  Hardcoded DATA_DIR → accepts list[Complaint]    (Parameterize)
-  r.get("state", "Unknown") → c.state             (Extract structure)
-  Report generation removed → reports/markdown.py  (Separate concerns)
-
-These are PURE FUNCTIONS: data in, results out, no side effects.
-That means you can test them without a filesystem or API connection.
-"""
+"""CFPB complaint analysis — pure functions over Complaint data."""
 
 from collections import Counter
 
