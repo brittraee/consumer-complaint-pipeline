@@ -113,8 +113,8 @@ class TestFetchComplaints:
         call_args = mock_client.get.call_args
         params = call_args[1].get("params", call_args[0][1] if len(call_args[0]) > 1 else {})
         where = params.get("$where", "")
-        assert "open_date >= '2025-01-01'" in where
-        assert "business_type = 'Retail'" in where
+        assert "openeddate >= '2025-01-01'" in where
+        assert "businesscategory = 'Retail'" in where
 
     @patch("complaint_pipeline.wa_ag.client.httpx.Client")
     def test_fetch_empty(self, mock_client_cls):

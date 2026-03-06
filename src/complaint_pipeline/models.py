@@ -177,9 +177,9 @@ class WaAgComplaint:
     @classmethod
     def from_api_response(cls, item: dict) -> "WaAgComplaint":
         """Create a WaAgComplaint from a Socrata API response item."""
-        raw_open = item.get("open_date", "")
+        raw_open = item.get("openeddate", item.get("open_date", ""))
         open_date = raw_open[:10] if raw_open else ""
-        raw_close = item.get("close_date", "")
+        raw_close = item.get("closeddate", item.get("close_date", ""))
         close_date = raw_close[:10] if raw_close else ""
 
         return cls(
@@ -187,13 +187,13 @@ class WaAgComplaint:
             open_date=open_date,
             close_date=close_date,
             status=item.get("status", ""),
-            company_name=item.get("company_name", item.get("business_name", "")),
-            business_type=item.get("business_type", ""),
-            complaint_category=item.get("complaint_category", item.get("naics_code", "")),
+            company_name=item.get("business", item.get("company_name", "")),
+            business_type=item.get("businesscategory", item.get("business_type", "")),
+            complaint_category=item.get("naics", item.get("complaint_category", "")),
             resolution=item.get("resolution", ""),
-            consumer_city=item.get("consumer_city", item.get("city", "")),
-            consumer_state=item.get("consumer_state", item.get("state", "")),
-            consumer_zip=item.get("consumer_zip", item.get("zip", "")),
+            consumer_city=item.get("businesscity", item.get("consumer_city", "")),
+            consumer_state=item.get("businessstate", item.get("consumer_state", "")),
+            consumer_zip=item.get("businesszip", item.get("consumer_zip", "")),
         )
 
     @classmethod

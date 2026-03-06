@@ -26,14 +26,14 @@ def fetch_complaints(
     params: dict[str, str | int] = {
         "$limit": min(limit, MAX_LIMIT),
         "$offset": offset,
-        "$order": "open_date DESC",
+        "$order": "openeddate DESC",
     }
 
     where_clauses = []
     if since:
-        where_clauses.append(f"open_date >= '{since}'")
+        where_clauses.append(f"openeddate >= '{since}'")
     if business_type:
-        where_clauses.append(f"business_type = '{business_type}'")
+        where_clauses.append(f"businesscategory = '{business_type}'")
     if status:
         where_clauses.append(f"status = '{status}'")
     if where_clauses:
