@@ -62,6 +62,53 @@ class Complaint:
 
 
 @dataclass
+class FccComplaint:
+    """A single FCC consumer complaint record (Unwanted Calls dataset)."""
+
+    complaint_id: str = ""
+    issue_date: str = ""
+    issue_time: str = ""
+    issue_type: str = ""
+    method: str = ""
+    issue: str = ""
+    caller_id_number: str = ""
+    call_type: str = ""
+    advertiser_business_phone_number: str = ""
+    state: str = ""
+    zip_code: str = ""
+
+    @classmethod
+    def from_api_response(cls, item: dict) -> "FccComplaint":
+        """Create an FccComplaint from a Socrata API response item."""
+        # Normalize the ISO datetime to date-only string
+        raw_date = item.get("issue_date", "")
+        date_str = raw_date[:10] if raw_date else ""
+
+        return cls(
+            complaint_id=str(item.get("id", "")),
+            issue_date=date_str,
+            issue_time=item.get("issue_time", ""),
+            issue_type=item.get("issue_type", ""),
+            method=item.get("method", ""),
+            issue=item.get("issue", ""),
+            caller_id_number=item.get("caller_id_number", ""),
+            # Note: the FCC API has a typo — "messge" instead of "message"
+            call_type=item.get("type_of_call_or_messge", ""),
+            advertiser_business_phone_number=item.get("advertiser_business_phone_number", ""),
+            state=item.get("state", ""),
+            zip_code=item.get("zip", ""),
+        )
+
+    @classmethod
+    def from_csv_row(cls, row: dict) -> "FccComplaint":
+        """Create an FccComplaint from a CSV DictReader row."""
+        return cls(**{k: row.get(k, "") for k in cls.__dataclass_fields__})
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass
 class Filing:
     """A single SEC EDGAR filing record."""
 
