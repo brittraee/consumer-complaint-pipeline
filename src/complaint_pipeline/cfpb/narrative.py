@@ -317,6 +317,69 @@ def _classify_custom_signals(
     return result
 
 
+def classify_scam_types(
+    complaints: list[Complaint],
+    signals: dict[str, list[str]] | None = None,
+    threshold: int = 2,
+) -> dict[str, int | float | dict]:
+    """Multi-label scam-type classifier with co-occurrence tracking.
+
+    Unlike classify_fraud_type() which picks a single winner, this assigns
+    ALL categories that meet the keyword match threshold. A complaint about
+    a fake charge alert leading to remote access scores in both categories.
+
+    Args:
+        complaints: List of complaints to classify.
+        signals: Dict of {category: [keywords]}. Required.
+        threshold: Minimum keyword matches to assign a category (default: 2).
+
+    Returns dict with per-category counts, co-occurrence pairs,
+    and multi-label statistics.
+    """
+    if signals is None:
+        signals = {}
+
+    categories = list(signals.keys())
+    counts = {cat: 0 for cat in categories}
+    counts["unclassified"] = 0
+    co_occurrences: Counter[tuple[str, ...]] = Counter()
+    total = 0
+    multi_label_count = 0
+
+    for c in complaints:
+        if not c.narrative:
+            continue
+        total += 1
+        text = c.narrative.lower()
+
+        scores = {cat: sum(1 for kw in kws if kw in text) for cat, kws in signals.items()}
+        matched = sorted(cat for cat, score in scores.items() if score >= threshold)
+
+        if not matched:
+            counts["unclassified"] += 1
+        else:
+            for cat in matched:
+                counts[cat] += 1
+            if len(matched) > 1:
+                multi_label_count += 1
+                for i in range(len(matched)):
+                    for j in range(i + 1, len(matched)):
+                        co_occurrences[(matched[i], matched[j])] += 1
+
+    result: dict[str, int | float | dict] = {
+        "total": total,
+        "unclassified": counts["unclassified"],
+        "multi_label_count": multi_label_count,
+        "multi_label_pct": round(100 * multi_label_count / total, 1) if total > 0 else 0,
+        "co_occurrences": dict(co_occurrences.most_common()),
+    }
+    for cat in categories:
+        result[cat] = counts[cat]
+        result[f"{cat}_pct"] = round(100 * counts[cat] / total, 1) if total > 0 else 0
+
+    return result
+
+
 # --- Geographic clustering ---
 
 def geographic_clustering(
