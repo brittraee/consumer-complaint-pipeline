@@ -156,6 +156,56 @@ class FtcComplaint:
 
 
 @dataclass
+class WaAgComplaint:
+    """A single WA State Attorney General consumer complaint record.
+
+    Data source: https://data.wa.gov/resource/gpri-47xz.json
+    """
+
+    complaint_id: str = ""
+    open_date: str = ""
+    close_date: str = ""
+    status: str = ""
+    company_name: str = ""
+    business_type: str = ""
+    complaint_category: str = ""
+    resolution: str = ""
+    consumer_city: str = ""
+    consumer_state: str = ""
+    consumer_zip: str = ""
+
+    @classmethod
+    def from_api_response(cls, item: dict) -> "WaAgComplaint":
+        """Create a WaAgComplaint from a Socrata API response item."""
+        raw_open = item.get("open_date", "")
+        open_date = raw_open[:10] if raw_open else ""
+        raw_close = item.get("close_date", "")
+        close_date = raw_close[:10] if raw_close else ""
+
+        return cls(
+            complaint_id=str(item.get("id", item.get("complaint_id", ""))),
+            open_date=open_date,
+            close_date=close_date,
+            status=item.get("status", ""),
+            company_name=item.get("company_name", item.get("business_name", "")),
+            business_type=item.get("business_type", ""),
+            complaint_category=item.get("complaint_category", item.get("naics_code", "")),
+            resolution=item.get("resolution", ""),
+            consumer_city=item.get("consumer_city", item.get("city", "")),
+            consumer_state=item.get("consumer_state", item.get("state", "")),
+            consumer_zip=item.get("consumer_zip", item.get("zip", "")),
+        )
+
+    @classmethod
+    def from_csv_row(cls, row: dict) -> "WaAgComplaint":
+        """Create a WaAgComplaint from a CSV DictReader row."""
+        return cls(**{k: row.get(k, "") for k in cls.__dataclass_fields__})
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass
 class Filing:
     """A single SEC EDGAR filing record."""
 
