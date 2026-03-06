@@ -279,6 +279,98 @@ def sec_summary_report(
     return "\n".join(lines)
 
 
+def generate_scam_report(
+    complaints: list[Complaint],
+    signals: dict[str, list[str]],
+    threshold: int = 2,
+) -> str:
+    """Generate a scam-type classification report."""
+    from complaint_pipeline.cfpb.narrative import classify_scam_types
+
+    lines = [
+        "# Scam-Type Classification Report",
+        f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+        f"**Total Complaints Analyzed**: {len(complaints)}",
+        f"**Threshold**: {threshold} keyword matches",
+        "",
+    ]
+
+    if not complaints:
+        lines.append("No complaints to classify.")
+        return "\n".join(lines)
+
+    result = classify_scam_types(complaints, signals=signals, threshold=threshold)
+
+    # Summary stats
+    lines.extend([
+        "## Summary",
+        "",
+        f"- **Classified**: {result['total'] - result['unclassified']} / {result['total']}",
+        f"- **Unclassified**: {result['unclassified']}",
+        f"- **Multi-label**: {result['multi_label_count']} ({result['multi_label_pct']}%)",
+        "",
+    ])
+
+    # Category breakdown table
+    categories = list(signals.keys())
+    lines.extend([
+        "## Category Breakdown",
+        "",
+        "| Category | Count | % |",
+        "|----------|-------|---|",
+    ])
+    for cat in sorted(categories, key=lambda c: result.get(c, 0), reverse=True):
+        count = result.get(cat, 0)
+        pct = result.get(f"{cat}_pct", 0)
+        lines.append(f"| {cat} | {count} | {pct}% |")
+    lines.extend([
+        f"| unclassified | {result['unclassified']} | "
+        f"{round(100 * result['unclassified'] / result['total'], 1) if result['total'] > 0 else 0}% |",
+        "",
+    ])
+
+    # Co-occurrence section
+    co = result.get("co_occurrences", {})
+    if co:
+        lines.extend([
+            "## Co-Occurrence Patterns",
+            "",
+            "Complaints matching multiple scam categories — shows how tactics chain together.",
+            "",
+            "| Category A | Category B | Count |",
+            "|------------|------------|-------|",
+        ])
+        for (cat_a, cat_b), count in sorted(co.items(), key=lambda x: -x[1]):
+            lines.append(f"| {cat_a} | {cat_b} | {count} |")
+        lines.append("")
+
+    # Example excerpts per category
+    lines.extend([
+        "## Example Narratives",
+        "",
+    ])
+    for cat in sorted(categories, key=lambda c: result.get(c, 0), reverse=True):
+        if result.get(cat, 0) == 0:
+            continue
+        lines.append(f"### {cat}")
+        lines.append("")
+        examples = 0
+        for c in complaints:
+            if not c.narrative or examples >= 3:
+                break
+            text = c.narrative.lower()
+            score = sum(1 for kw in signals[cat] if kw in text)
+            if score >= threshold:
+                excerpt = c.narrative[:200].replace("\n", " ")
+                if len(c.narrative) > 200:
+                    excerpt += "..."
+                lines.append(f"> {excerpt}")
+                lines.append("")
+                examples += 1
+
+    return "\n".join(lines)
+
+
 def write_report(content: str, filepath: Path) -> None:
     """Write a report string to a file."""
     filepath.parent.mkdir(parents=True, exist_ok=True)

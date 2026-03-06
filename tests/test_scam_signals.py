@@ -7,6 +7,7 @@ from complaint_pipeline.cfpb.scam_signals import (
 )
 from complaint_pipeline.cfpb.narrative import classify_scam_types
 from complaint_pipeline.models import Complaint
+from complaint_pipeline.reports.markdown import generate_scam_report
 
 
 def _complaint(narrative="", **kwargs):
@@ -188,3 +189,35 @@ class TestClassifyScamTypesPerCategory:
         )]
         result = classify_scam_types(complaints, signals=SCAM_TYPE_SIGNALS)
         assert result["identity_theft"] >= 1
+
+
+class TestGenerateScamReport:
+    def test_report_contains_header(self):
+        complaints = [
+            _complaint("remote access virus teamviewer computer infected tech support pop-up"),
+            _complaint("icloud storage full photos will be deleted upgrade storage verify apple id"),
+            _complaint("general complaint about something"),
+        ]
+        report = generate_scam_report(complaints, signals=SCAM_TYPE_SIGNALS)
+        assert "# Scam-Type Classification Report" in report
+        assert "Total Complaints Analyzed" in report
+
+    def test_report_contains_category_table(self):
+        complaints = [
+            _complaint("remote access virus teamviewer computer infected tech support pop-up"),
+        ]
+        report = generate_scam_report(complaints, signals=SCAM_TYPE_SIGNALS)
+        assert "| Category |" in report
+        assert "tech_support" in report
+
+    def test_report_contains_co_occurrences(self):
+        complaints = [_complaint(
+            "irs warrant arrest impersonation legal action "
+            "told to buy gift card itunes read the code scratched off"
+        )]
+        report = generate_scam_report(complaints, signals=SCAM_TYPE_SIGNALS)
+        assert "Co-Occurrence" in report
+
+    def test_report_empty_input(self):
+        report = generate_scam_report([], signals=SCAM_TYPE_SIGNALS)
+        assert "No complaints" in report
