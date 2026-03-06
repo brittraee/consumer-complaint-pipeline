@@ -100,6 +100,74 @@ def analyze(input_dir: Path, output: Path) -> None:
     click.echo(f"Comparison report: {report_path}")
 
 
+@cfpb.command("classify-scams")
+@click.option(
+    "--input", "-i", "input_dir",
+    type=click.Path(exists=True, path_type=Path),
+    default=Path("data/cfpb-complaints"),
+    help="Directory containing complaint CSVs.",
+)
+@click.option(
+    "--output", "-o",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Output directory for classification report.",
+)
+@click.option(
+    "--threshold", "-t",
+    type=int,
+    default=2,
+    help="Minimum keyword matches per category (default: 2).",
+)
+def classify_scams(input_dir: Path, output: Path | None, threshold: int) -> None:
+    """Classify complaint narratives by scam type."""
+    from complaint_pipeline.cfpb.narrative import classify_scam_types
+    from complaint_pipeline.cfpb.scam_signals import SCAM_TYPE_SIGNALS
+    from complaint_pipeline.reports.markdown import generate_scam_report
+
+    # Load all CSVs from input directory
+    csv_files = list(input_dir.glob("*_complaints.csv"))
+    if not csv_files:
+        click.echo("No complaint data found. Run 'complaint-pipeline cfpb fetch' first.")
+        raise SystemExit(1)
+
+    all_complaints = []
+    for csv_file in csv_files:
+        complaints = cfpb_client.load_complaints_csv(csv_file)
+        all_complaints.extend(complaints)
+        click.echo(f"Loaded {len(complaints)} complaints from {csv_file.name}")
+
+    click.echo(f"\nClassifying {len(all_complaints)} total complaints (threshold={threshold})...")
+
+    result = classify_scam_types(all_complaints, signals=SCAM_TYPE_SIGNALS, threshold=threshold)
+
+    # Print summary table
+    click.echo(f"\n{'Category':<25} {'Count':>6} {'%':>7}")
+    click.echo("-" * 40)
+    categories = list(SCAM_TYPE_SIGNALS.keys())
+    for cat in sorted(categories, key=lambda c: result.get(c, 0), reverse=True):
+        count = result.get(cat, 0)
+        pct = result.get(f"{cat}_pct", 0)
+        if count > 0:
+            click.echo(f"{cat:<25} {count:>6} {pct:>6.1f}%")
+    click.echo(f"{'unclassified':<25} {result['unclassified']:>6}")
+    click.echo(f"\nMulti-label: {result['multi_label_count']} ({result['multi_label_pct']}%)")
+
+    # Co-occurrences
+    co = result.get("co_occurrences", {})
+    if co:
+        click.echo(f"\nTop co-occurrences:")
+        for (a, b), count in list(co.items())[:10]:
+            click.echo(f"  {a} + {b}: {count}")
+
+    # Write report if output specified
+    if output:
+        report = generate_scam_report(all_complaints, signals=SCAM_TYPE_SIGNALS, threshold=threshold)
+        report_path = output / "scam_classification.md"
+        markdown.write_report(report, report_path)
+        click.echo(f"\nReport written to {report_path}")
+
+
 # ---------- SEC subcommands ----------
 
 @main.group()

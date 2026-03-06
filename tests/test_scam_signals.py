@@ -8,6 +8,8 @@ from complaint_pipeline.cfpb.scam_signals import (
 from complaint_pipeline.cfpb.narrative import classify_scam_types
 from complaint_pipeline.models import Complaint
 from complaint_pipeline.reports.markdown import generate_scam_report
+from click.testing import CliRunner
+from complaint_pipeline.cli import main
 
 
 def _complaint(narrative="", **kwargs):
@@ -221,3 +223,19 @@ class TestGenerateScamReport:
     def test_report_empty_input(self):
         report = generate_scam_report([], signals=SCAM_TYPE_SIGNALS)
         assert "No complaints" in report
+
+
+class TestClassifyScamsCli:
+    def test_command_exists(self):
+        runner = CliRunner()
+        result = runner.invoke(main, ["cfpb", "classify-scams", "--help"])
+        assert result.exit_code == 0
+        assert "Classify complaint narratives" in result.output
+
+    def test_no_data_shows_error(self, tmp_path):
+        runner = CliRunner()
+        result = runner.invoke(main, [
+            "cfpb", "classify-scams",
+            "--input", str(tmp_path),
+        ])
+        assert "No complaint data found" in result.output
