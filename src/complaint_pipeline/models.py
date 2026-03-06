@@ -109,6 +109,53 @@ class FccComplaint:
 
 
 @dataclass
+class FtcComplaint:
+    """A single FTC Do Not Call complaint record.
+
+    Data source: https://api.ftc.gov/v0/dnc-complaints
+    """
+
+    complaint_id: str = ""
+    created_date: str = ""
+    violation_date: str = ""
+    company_phone_number: str = ""
+    consumer_city: str = ""
+    consumer_state: str = ""
+    consumer_area_code: str = ""
+    subject: str = ""
+    is_robocall: str = ""
+
+    @classmethod
+    def from_api_response(cls, item: dict) -> "FtcComplaint":
+        """Create an FtcComplaint from an FTC API response item.
+
+        The FTC API wraps fields in an 'attributes' object with
+        hyphenated keys (JSON:API style).
+        """
+        attrs = item.get("attributes", {})
+        robocall_raw = attrs.get("recorded-message-or-robocall", "")
+        return cls(
+            complaint_id=str(item.get("id", "")),
+            created_date=attrs.get("created-date", ""),
+            violation_date=attrs.get("violation-date", ""),
+            company_phone_number=attrs.get("company-phone-number", ""),
+            consumer_city=attrs.get("consumer-city", ""),
+            consumer_state=attrs.get("consumer-state", ""),
+            consumer_area_code=attrs.get("consumer-area-code", ""),
+            subject=attrs.get("subject", ""),
+            is_robocall=robocall_raw,
+        )
+
+    @classmethod
+    def from_csv_row(cls, row: dict) -> "FtcComplaint":
+        """Create an FtcComplaint from a CSV DictReader row."""
+        return cls(**{k: row.get(k, "") for k in cls.__dataclass_fields__})
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass
 class Filing:
     """A single SEC EDGAR filing record."""
 
