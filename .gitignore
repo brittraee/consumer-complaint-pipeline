@@ -38,3 +38,9 @@ AGENTS.md
 # Secrets
 .env
 .env.*
+
+# Internal planning docs
+docs/plans/
+
+# Auto-generated indexes
+_INDEX.md
